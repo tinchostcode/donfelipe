@@ -2336,15 +2336,9 @@ function confirmarVenta(){
   }
   const total=ventaItems.reduce((a,i)=>a+i.subtotal,0),pago=$('v-pago').value,cli=$('v-cli').value;
   if(total<=0){warn('El total de la venta no puede ser $0');return;}
-  if(pago==='mercadopago'){
-    pendingVenta={total,pago,cli,items:[...ventaItems]};
-    $('mp-amount').textContent=fmt(total);
-    $('mp-go-btn').onclick=()=>generarMP(total);
-    closeModal('m-venta');openModal('m-mp');return;
-  }
   // Resumen antes de confirmar
   const resumen=ventaItems.map(i=>`${i.nombre} ${i.kg}kg`).join(', ');
-  const pagoLbl={efectivo:'Efectivo',transferencia:'Transferencia',debito:'Débito'}[pago]||pago;
+  const pagoLbl={efectivo:'Efectivo',mercadopago:'Mercado Pago',transferencia:'Transferencia',debito:'Débito'}[pago]||pago;
   confirmar({
     icono:'💰',
     titulo:`Confirmar venta por ${fmt(total)}`,
@@ -2645,7 +2639,7 @@ async function renderReportes(){
       </div>
       ${d.mejor_dia?.fecha?`
       <div class="alert a-ok">
-        📅 Mejor día del mes: <b>${new Date(d.mejor_dia.fecha+'T00:00:00').toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'})}</b> — ${fmt(parseFloat(d.mejor_dia.total))}
+        📅 Mejor día del mes: <b>${(()=>{const iso=String(d.mejor_dia.fecha).slice(0,10);const [y,m,d2]=iso.split('-');const dias=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];const dt=new Date(parseInt(y),parseInt(m)-1,parseInt(d2));return dias[dt.getDay()]+' '+d2+' de '+meses[parseInt(m)-1];})()}</b> — ${fmt(parseFloat(d.mejor_dia.total))}
       </div>`:''}
     </div>`;
 }

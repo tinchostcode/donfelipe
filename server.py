@@ -1094,7 +1094,18 @@ def api_reporte_mensual():
             AND (anulada IS NULL OR anulada=FALSE)
             GROUP BY fecha ORDER BY total DESC LIMIT 1
         """, (mes,))
-        mejor_dia = dict(cur.fetchone()) if cur.rowcount else {}
+        row_md = cur.fetchone()
+        if row_md:
+            md = dict(row_md)
+            # Convertir fecha a string ISO para evitar problemas de serialización
+            if hasattr(md.get('fecha'), 'isoformat'):
+                md['fecha'] = md['fecha'].isoformat()
+            import decimal
+            if isinstance(md.get('total'), decimal.Decimal):
+                md['total'] = float(md['total'])
+            mejor_dia = md
+        else:
+            mejor_dia = {}
 
         # Ventas anuladas del mes
         cur.execute("""
